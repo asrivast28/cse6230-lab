@@ -3,7 +3,7 @@ CFLAGS =
 COPTFLAGS = -O3 -g
 LDFLAGS =
 
-qsort: driver.o sort.o sequential-sort.o parallel-qsort.o
+qsort: driver.o sort.o parallel-qsort.o
 	$(CC) $(COPTFLAGS) -o $@ $^
 
 %.o: %.cc
