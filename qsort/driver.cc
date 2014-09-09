@@ -25,6 +25,10 @@
 
 #include "sort.hh"
 
+#if defined (_OPENMP)
+  #include <omp.h>
+#endif
+
 /* ============================================================
  */
 
