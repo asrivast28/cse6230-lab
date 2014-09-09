@@ -1,6 +1,6 @@
 #PBS -q class
 #PBS -l nodes=1
-#PBS -l walltime=00:01:00
+#PBS -l walltime=00:02:00
 #PBS -N qsort
 
 # Changes to the directory we were in when we
@@ -16,10 +16,10 @@ echo "Node:" `hostname`
 echo "Current directory: ${PWD}"
 
 echo ""
-echo "=== Running 5 trials of Quicksort on 10 million elements ... ==="
+echo "=== Running 5 trials of Quicksort (OpenMP-based) on 10 million elements ... ==="
 for trial in 1 2 3 4 5 ; do
   echo "*** Trial ${trial} ***"
-  ./qsort 10000000
+  ./qsort-omp 10000000
 done
 
 echo ""

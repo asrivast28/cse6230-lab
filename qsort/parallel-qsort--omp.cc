@@ -1,7 +1,7 @@
 /**
- *  \file parallel-qsort.cc
+ *  \file parallel-qsort--omp.cc
  *
- *  \brief Implement your parallel quicksort algorithm in this file.
+ *  \brief Implement your OpenMP-based parallel quicksort algorithm in this file.
  */
 
 #include <assert.h>

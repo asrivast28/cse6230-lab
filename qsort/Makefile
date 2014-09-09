@@ -1,9 +1,9 @@
 CC = icpc
 CFLAGS =
-COPTFLAGS = -O3 -g
+COPTFLAGS = -O3 -g -fopenmp
 LDFLAGS =
 
-qsort: driver.o sort.o parallel-qsort.o
+qsort-omp: driver.o sort.o parallel-qsort--omp.o
 	$(CC) $(COPTFLAGS) -o $@ $^
 
 %.o: %.cc
