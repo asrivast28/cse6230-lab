@@ -9,6 +9,13 @@
 #include <stdlib.h>
 #include "sort.hh"
 
+/* The following preprocessor directive will abort the compilation if
+ * OpenMP is not available.
+ */
+#if !defined (_OPENMP)
+#  error "*** Must compile this file with OpenMP! ***"
+#endif
+
 /**
  *  Given a pivot value, this routine partitions a given input array
  *  into two sets: the set A_le, which consists of all elements less

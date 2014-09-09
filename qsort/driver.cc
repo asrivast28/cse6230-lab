@@ -42,6 +42,15 @@ main (int argc, char* argv[])
     return -1;
   }
 
+#if defined (_OPENMP)
+  #pragma omp parallel
+  #pragma omp single
+  {
+    int num_threads = omp_get_num_threads ();
+    fprintf (stderr, "=== OpenMP is enabled, with %d threads. ===\n", num_threads);
+  }
+#endif
+
   stopwatch_init ();
   struct stopwatch_t* timer = stopwatch_create (); assert (timer);
 
