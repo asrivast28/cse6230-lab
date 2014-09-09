@@ -1,6 +1,6 @@
 CC = icpc
 CFLAGS =
-COPTFLAGS = -O3 -g -fopenmp
+COPTFLAGS = -O3 -g -openmp
 LDFLAGS =
 
 qsort-omp: driver.o sort.o parallel-qsort--omp.o
