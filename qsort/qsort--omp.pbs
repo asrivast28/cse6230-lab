@@ -1,6 +1,6 @@
 #PBS -q class
 #PBS -l nodes=1
-#PBS -l walltime=00:02:00
+#PBS -l walltime=00:04:00
 #PBS -N qsort
 
 # Changes to the directory we were in when we
