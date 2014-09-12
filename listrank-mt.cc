@@ -4,6 +4,10 @@
  *  \brief Implement your Cilk Plus list ranking code here.
  */
 
+#include <cassert>
+#include <cstring>
+#include "listrank-mt.hh"
+
 static void
 rankList__cilk__ (int n, rank_t* Rank, const index_t* Next)
 {

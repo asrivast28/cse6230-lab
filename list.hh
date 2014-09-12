@@ -8,6 +8,8 @@
 #if !defined (INC_LIST_HH)
 #define INC_LIST_HH //!< list.hh included
 
+#include <string>
+
 typedef long index_t; //!< Node 'address': -1 (NIL), 0, 1, 2, 3, ...
 typedef unsigned long rank_t; //!< Rank value: 0, 1, 2, 3, ...
 
@@ -28,8 +30,8 @@ index_t* createRandomList (int n);
  *  (Debugging) Prints the contents of a ranked list, truncating the
  *  output after 'truncate' elements.
  */
-void printList (const string& tag, const rank_t* Rank, const index_t* Next,
-		index_t head=0, bool truncate=16);
+void printList (const std::string& tag, const rank_t* Rank, const index_t* Next,
+                index_t head=0, index_t truncate=16);
 
 #endif //!< list.hh included
 

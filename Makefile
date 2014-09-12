@@ -3,29 +3,43 @@
 EXEEXT =
 TARGETS = listrank$(EXEEXT)
 
-HDRS =
-HDRS += listrank.hh
-SRCS += listrank.cc
-OBJS += listrank.o
+CHDRS = timer.h
+CSRCS = $(CHDRS:.h=.c)
+COBJS = $(CSRCS:.c=.o)
 
-HDRS += listrank-mt.hh
-SRCS += listrank-mt.cc
-OBJS += listrank-mt.o
+CXXHDRS = list.hh listrank.hh listrank-mt.hh
+CXXSRCS = driver.cc $(CXXHDRS:.hh=.cc)
+CXXOBJS = $(CXXSRCS:.cc=.o)
 
-#HDRS += listrank-gpu.hh
-#SRCS += listrank-gpu.cu
-#OBJS += listrank-gpu.o
+#CUDAHDRS += listrank-gpu.hh
+#CUDASRCS += $(CUDAHDRS:.hh=.cu)
 
-CC = icpc
+CC = icc
 CFLAGS = -O3 -g
-LDLFLAGS =
+
+CXX = icpc
+CXXFLAGS = -O3 -g
+
+CUDAC = nvcc
+CUDAFLAGS =
+
+LDFLAGS =
 
 all: $(TARGETS)
 
-listrank$(EXEEXT): $(HDRS) $(SRCS) Makefile
-	$(CC) $(CFLAGS) $(COPTFLAGS) -o $@ $(SRCS) $(LDFLAGS)
+listrank$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile
+	$(CXX) $(CXXFLAGS) -o $@ $(CXXOBJS) $(COBJS) $(LDFLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+%.o: %.cc
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+%.o: %.cu
+	$(CUDAC) $(CUDACFLAGS) -o $@ -c $<
 
 clean:
-	rm -f $(OBJS) *~ core $(TARGETS)
+	rm -f *~ core $(TARGETS)
 
 # eof

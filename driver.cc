@@ -6,12 +6,17 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <strings.h> // for bzero
+
 #include <algorithm>
 #include <iostream>
 #include <string>
+
 #include "timer.h"
 
-#include "listrank-seq.hh"
+#include "list.hh"
+#include "listrank.hh"
+#include "listrank-mt.hh"
 
 using namespace std;
 
@@ -71,7 +76,7 @@ main (int argc, char* argv[])
     bzero (Rank_seq, N * sizeof (rank_t));
     printList ("Sequential: before", Rank_seq, Next);
     stopwatch_start (timer);
-    rankList__seq (N, Rank_seq, Next, 0 /* head */);
+    rankList (N, Rank_seq, Next, 0 /* head */);
     long double t_seq = stopwatch_stop (timer); /* seconds */
     long double bw_seq = estimateBandwidth (N, t_seq) * 1e-9; /* GB/s */
     cerr << "    (Done: " << t_seq << " sec, " << bw_seq << " GB/s.)" << endl;

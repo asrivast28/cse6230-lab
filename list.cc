@@ -4,6 +4,17 @@
  *  \brief Implements the list.hh interface.
  */
 
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+
+#include <algorithm>
+#include <iostream>
+
+#include "list.hh"
+
+using namespace std;
+
 /* ====================================================================== */
 
 index_t *
@@ -12,6 +23,16 @@ duplicate (int n, const index_t* A)
   index_t* B = new index_t[n]; assert (B);
   memcpy (B, A, n * sizeof (index_t));
   return B;
+}
+
+/** Generates a uniform random permutation of an array */
+static void
+shuffle (int n, index_t* A)
+{
+  // Implements the Fisher-Yates (Knuth) algorithm:
+  // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+  for (int i = 0; i < (n-1); ++i)
+    swap (A[i], A[i+1+(lrand48 () % (n-i-1))]);
 }
 
 /* ====================================================================== */
@@ -43,19 +64,8 @@ createRandomList (int n)
 
 /* ====================================================================== */
 
-/** Generates a uniform random permutation of an array */
-static void
-shuffle (int n, index_t* A)
-{
-  // Implements the Fisher-Yates (Knuth) algorithm:
-  // http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-  for (int i = 0; i < (n-1); ++i)
-    swap (A[i], A[i+1+(lrand48 () % (n-i-1))]);
-}
-
-void
-printList (const string& tag, const rank_t* Rank, const index_t* Next,
-           index_t head, index_t truncate)
+void printList (const string& tag, const rank_t* Rank, const index_t* Next,
+                index_t head, index_t truncate)
 {
   index_t count = 0;
 
@@ -70,11 +80,11 @@ printList (const string& tag, const rank_t* Rank, const index_t* Next,
   else
     do {
       if (!truncate || ++count <= truncate) {
-	cerr << ' ' << Rank[cur_node];
-	cur_node = Next[cur_node];
+        cerr << ' ' << Rank[cur_node];
+        cur_node = Next[cur_node];
       } else {
-	cerr << " ...";
-	break;
+        cerr << " ...";
+        break;
       }
     } while (cur_node != NIL);
   cerr << " ]" << endl;

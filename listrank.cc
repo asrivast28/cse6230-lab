@@ -7,7 +7,7 @@
 #include "listrank.hh"
 
 void
-rankList__seq (int n, rank_t* Rank, const index_t* Next, index_t head)
+rankList (int n, rank_t* Rank, const index_t* Next, index_t head)
 {
   if (n == 0 || head == NIL) return; // pool or list are empty
 
