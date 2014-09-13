@@ -4,7 +4,7 @@ EXEEXT =
 TARGETS =
 
 TARGETS =listrank-cilk$(EXEEXT)
-#TARGETS += listrank-cuda$(EXEEXT)
+TARGETS += listrank-cuda$(EXEEXT)
 
 CHDRS = timer.h
 CSRCS = $(CHDRS:.h=.c)
@@ -23,15 +23,24 @@ CFLAGS = -O3 -g
 CXX = icpc
 CXXFLAGS = -O3 -g
 
-CUDAC = nvcc
-CUDAFLAGS =
+CUDAROOT = /opt/cuda-4.2/cuda
+CUDAC = $(CUDAROOT)/bin/nvcc
+CUDAFLAGS = -O3 -arch=sm_20
+CUDALDFLAGS = -L$(CUDAROOT)/lib64 -lcudart
 
 LDFLAGS =
 
 all: $(TARGETS)
 
-listrank-cilk$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile listrank-par.hh listrank-cilk.cc
+listrank-cilk$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile \
+	                listrank-par.hh listrank-cilk.cc
 	$(CXX) $(CXXFLAGS) -o $@ listrank-cilk.cc $(CXXOBJS) $(COBJS) $(LDFLAGS)
+
+listrank-cuda$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile \
+	                listrank-par.hh listrank-cuda.cu
+	$(CUDAC) $(CUDAFLAGS) -o listrank-cuda.o -c listrank-cuda.cu
+	$(CXX) $(CXXFLAGS) -o $@ listrank-cuda.o $(CXXOBJS) $(COBJS) \
+		$(LDFLAGS) $(CUDALDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<

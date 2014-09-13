@@ -67,6 +67,8 @@ static void
 computeListRanks__cilk__ (size_t n, const index_t* Next, rank_t* Rank)
 {
   if (n == 0) return; // empty pool
+  assert (Next);
+  assert (Rank);
 
   // Initial values on which we will perform the list-based 'scan' /
   // 'prefix sum'
@@ -77,9 +79,9 @@ computeListRanks__cilk__ (size_t n, const index_t* Next, rank_t* Rank)
   //
   // ... YOUR CODE GOES HERE ...
   //
-  // (you may also modify the preceding code if you wish)
+  // (you may also modify any of the preceding code if you wish)
   //
-#include "soln--cilk.cc"
+  //#include "soln--cilk.cc" // Instructor's solution: none for you!
   //------------------------------------------------------------
 }
 
