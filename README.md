@@ -1,6 +1,6 @@
-CSE 6230, Fall 2014: Lab 2 -- OpenMP
-====================================
+CSE 6230, Fall 2014: Lab 3 -- CUDA
+==================================
 
-> Due: Sep 16, 2014 @ 4:35pm (just before class)
+> Due: Sep 23, 2014 @ 4:35pm (just before class)
 
-For instructions, see: https://bitbucket.org/rvuduc/lab2/wiki/Home
+For instructions, see: https://bitbucket.org/gtcse6230fa14/lab3/wiki/Home
