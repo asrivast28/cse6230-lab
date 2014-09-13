@@ -9,6 +9,14 @@
 
 #include "list.hh"
 
+typedef unsigned long rank_t; //!< Rank value: 0, 1, 2, 3, ...
+
+/** Returns new space for storing ranks. */
+rank_t* createRanksBuffer (size_t n);
+
+/** Frees rank buffer space. */
+void releaseRanksBuffer (rank_t* Rank);
+
 /**
  *  Given a linked list represented as an array pool, this routine
  *  computes 'Rank[i]' to be the distance to the tail of each node
@@ -16,7 +24,16 @@
  *  represented by 'Rank[head]' and 'Next[head]'. 'head' may be 'NIL'
  *  if the list is empty.
  */
-extern "C" void rankList (int n, rank_t* Rank, const index_t* Next, index_t head);
+void computeListRanks (index_t head, const index_t* Next, rank_t* Rank);
+
+/**
+ *  (Debugging) Prints the contents of a ranked list, truncating the
+ *  output after 'truncate' elements.
+ */
+void printListRanks (const std::string& tag,
+                     index_t head, const index_t* Next,
+                     const rank_t* Rank,
+                     index_t truncate=16);
 
 #endif // !defined (INC_LISTRANK_HH)
 

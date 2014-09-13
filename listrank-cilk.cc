@@ -1,12 +1,24 @@
 // -*- mode:c++; tab-width:2; indent-tabs-mode:nil;  -*-
 /**
- *  \file listrank-mt.cc
- *  \brief Implement your Cilk Plus list ranking code here.
+ *  \file listrank-par.cc
+ *
+ *  \brief Implement the 'listrank-par.hh' interface using Cilk Plus.
  */
 
 #include <cassert>
 #include <cstring>
-#include "listrank-mt.hh"
+#include "listrank-par.hh"
+
+// ============================================================
+
+struct ParListRank_t__
+{
+  int n;
+  rank_t* Rank;
+  index_t* Next;
+};
+
+// ============================================================
 
 static void
 rankList__cilk__ (int n, rank_t* Rank, const index_t* Next)
@@ -44,9 +56,10 @@ rankList__cilk__ (int n, rank_t* Rank, const index_t* Next)
 }
 
 void
-rankList__mt (int n, rank_t* Rank, const index_t* Next)
+rankList__par (ParListRank_t* L)
 {
-  rankList__cilk__ (n, Rank, Next);
+  assert (L != NULL);
+  rankList__cilk__ (L->n, L->Rank, L->Next);
 }
 
 // eof

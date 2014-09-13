@@ -7,7 +7,7 @@ CHDRS = timer.h
 CSRCS = $(CHDRS:.h=.c)
 COBJS = $(CSRCS:.c=.o)
 
-CXXHDRS = list.hh listrank.hh listrank-mt.hh
+CXXHDRS = list.hh listrank.hh listrank-par.hh
 CXXSRCS = driver.cc $(CXXHDRS:.hh=.cc)
 CXXOBJS = $(CXXSRCS:.cc=.o)
 
