@@ -14,12 +14,13 @@
 #if !defined (INC_QUICKSELECT_HH)
 #define INC_QUICKSELECT_HH //!< quickselect.hh included
 
+#include <cassert>
 #include <cstdlib>
 #include <algorithm>
 
 template <typename ELEM_T>
 ELEM_T
-selectMedian (const ELEM_T* arr, size_t n)
+selectMedian (ELEM_T* arr, size_t n)
 {
   size_t low, high;
   size_t median;
@@ -32,7 +33,7 @@ selectMedian (const ELEM_T* arr, size_t n)
     
     if (high == low + 1) {  /* Two elements only */
       if (arr[low] > arr[high])
-	std::swap (arr[low], arr[high]) ;
+        std::swap (arr[low], arr[high]) ;
       break;
     }
     
@@ -68,6 +69,7 @@ selectMedian (const ELEM_T* arr, size_t n)
       high = hh - 1;
   }
 
+  assert (median < n);
   return arr[median];
 }
 

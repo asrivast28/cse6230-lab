@@ -16,6 +16,13 @@
 using namespace std;
 
 // ============================================================
+const char *
+getImplName__par (void)
+{
+  return "CILK";
+}
+
+// ============================================================
 
 struct ParRankedList_t__
 {
@@ -33,12 +40,11 @@ setupRanks__par (size_t n, const index_t* Next)
   assert (L);
 
   L->n = n;
-  L->Next = duplicate (n, Next);
+  L->Next = Next;
   L->Rank = createRanksBuffer (n);
 
   return L;
 }
-
 
 void releaseRanks__par (ParRankedList_t* L)
 {

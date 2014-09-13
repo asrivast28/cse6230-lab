@@ -13,6 +13,7 @@
 #include <string>
 
 #include "timer.h"
+#include "quickselect.hh"
 
 #include "list.hh"
 #include "listrank.hh"
@@ -89,7 +90,7 @@ getStats (long double* T, size_t n,
   t_median = T[0];
   for (size_t i = 1; i < n; ++i) {
     if (T[i] < t_min) t_min = T[i];
-    if (T[i] < t_max) t_max = T[i];
+    if (T[i] > t_max) t_max = T[i];
     t_mean += T[i];
   }
   t_mean /= n;
@@ -106,23 +107,25 @@ benchmarkSequential (size_t N, size_t num_trials, struct stopwatch_t* timer)
   if (!num_trials) return;
 
   assert (timer);
-  assert ((Next && Rank) || !N);
 
   cerr << endl << "... benchmarking the sequential algorithm ..." << endl;
 
-  long double* Times = new long double[num_trials]; assert (times);
+  long double* Times = new long double[num_trials]; assert (Times);
 
   for (size_t trial = 0; trial < num_trials; ++trial) {
     index_t* Next = createRandomList (N);
-    rank_t* Rank_true = createRanksBuffer (N);
+    rank_t* Rank = createRanksBuffer (N);
     stopwatch_start (timer);
-    computeListRanks (0, Next, Rank_true);
+    computeListRanks (0, Next, Rank);
     Times[trial] = stopwatch_stop (timer);
+    releaseListBuffer (Next);
+    releaseRanksBuffer (Rank);
   }
 
   long double t_min, t_max, t_median, t_mean;
+  getStats (Times, num_trials, t_min, t_max, t_mean, t_median);
   cout << "SEQ" << ',' << N << ',' << num_trials
-       << ',' << estimateBandwidth (N, t_median)
+       << ',' << estimateBandwidth (N, t_median)*1e-9
        << ',' << t_min << ',' << t_median << ',' << t_max << ',' << t_mean
        << endl;
 
@@ -131,29 +134,64 @@ benchmarkSequential (size_t N, size_t num_trials, struct stopwatch_t* timer)
 
 /* ====================================================================== */
 
-#if 0
 /**
  *  Benchmarks the sequential list ranking implementation on the given
  *  linked list, and returns its running time, in seconds.
  */
-static long double
-benchmarkParallel (int N, index_t* Next, struct stopwatch_t* timer)
+static void
+benchmarkParallel (size_t N, size_t num_trials, struct stopwatch_t* timer)
 {
-    cerr << endl << "... running parallel algorithm ..." << endl;
-    rank_t* Rank_par = new size_t[N]; assert (Rank_par);
-    bzero (Rank_par, N * sizeof (rank_t));
-    printList ("Parallel: before", Rank_par, Next);
+  if (!num_trials) return;
+
+  assert (timer);
+
+  cerr << endl << "... benchmarking the parallel algorithm ..." << endl;
+
+  long double* T_pre = new long double[num_trials]; assert (T_pre);
+  long double* T_rank = new long double[num_trials]; assert (T_rank);
+  long double* T_post = new long double[num_trials]; assert (T_post);
+
+  for (size_t trial = 0; trial < num_trials; ++trial) {
+    index_t* Next = createRandomList (N);
+
     stopwatch_start (timer);
-#if 0
-    rankList__par (N, Rank_par, Next);
-#endif
+    ParRankedList_t* rankedList = setupRanks__par (N, Next);
+    T_pre[trial] = stopwatch_stop (timer);
+
+    stopwatch_start (timer);
+    computeListRanks__par (rankedList);
+    T_rank[trial] = stopwatch_stop (timer);
+
+    stopwatch_start (timer);
+    const rank_t* Rank = getRanks__par (rankedList);
+    T_post[trial] = stopwatch_stop (timer);
+
+    releaseRanks__par (rankedList);
+    releaseListBuffer (Next);
+  }
+
+  long double t_min, t_max, t_median, t_mean;
+  getStats (T_rank, num_trials, t_min, t_max, t_mean, t_median);
+  const char* name = getImplName__par ();
+  cout << name << ',' << N << ',' << num_trials
+       << ',' << estimateBandwidth (N, t_median)*1e-9
+       << ',' << t_min << ',' << t_median << ',' << t_max << ',' << t_mean;
+  getStats (T_pre, num_trials, t_min, t_max, t_mean, t_median);
+  cout << ',' << t_min << ',' << t_median << ',' << t_max << ',' << t_mean;
+  getStats (T_post, num_trials, t_min, t_max, t_mean, t_median);
+  cout << ',' << t_min << ',' << t_median << ',' << t_max << ',' << t_mean;
+  cout << endl;
+
+  delete[] T_post;
+  delete[] T_rank;
+  delete[] T_pre;
 }
-#endif
 
 static void
 benchmarkListRankers (size_t n, size_t num_trials, struct stopwatch_t* timer)
 {
   benchmarkSequential (n, num_trials, timer);
+  benchmarkParallel (n, num_trials, timer);
 }
 
 /* ====================================================================== */

@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+  /** Returns a short string naming the implementation */
+  const char* getImplName__par (void);  
+
   /**
    *  Opaque, implementation-dependent data type for storing a parallel
    *  list ranking data structure.
