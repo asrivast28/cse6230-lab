@@ -7,35 +7,65 @@
 
 #include <cassert>
 #include <cstring>
+
+#include <algorithm>
+#include <iostream>
+
 #include "listrank-par.hh"
+
+using namespace std;
 
 // ============================================================
 
-struct ParListRank_t__
+struct ParRankedList_t__
 {
-  int n;
+  size_t n;
+  const index_t* Next;
   rank_t* Rank;
-  index_t* Next;
 };
 
 // ============================================================
 
+ParRankedList_t *
+setupRanks__par (size_t n, const index_t* Next)
+{
+  ParRankedList_t* L = new ParRankedList_t;
+  assert (L);
+
+  L->n = n;
+  L->Next = duplicate (n, Next);
+  L->Rank = createRanksBuffer (n);
+
+  return L;
+}
+
+
+void releaseRanks__par (ParRankedList_t* L)
+{
+  if (L) {
+    releaseRanksBuffer (L->Rank);
+  }
+}
+
+// ============================================================
+
+const rank_t *
+getRanks__par (const ParRankedList_t* L)
+{
+  return L->Rank;
+}
+
+// ============================================================
+
 static void
-rankList__cilk__ (int n, rank_t* Rank, const index_t* Next)
+computeListRanks__cilk__ (size_t n, const index_t* Next, rank_t* Rank)
 {
   if (n == 0) return; // empty pool
 
   // Initial values on which we will perform the list-based 'scan' /
   // 'prefix sum'
-  _Cilk_for (int i = 0; i < n; ++i)
+  _Cilk_for (size_t i = 0; i < n; ++i)
     Rank[i] = (Next[i] == NIL) ? 0 : 1;
-
-  // To help implement synchronization, it may be helpful have
-  // additional buffers. Here is some example code:
-  rank_t* Rank_cur = Rank;
-  index_t* Next_cur = duplicate (n, Next); // function we've provided
-  rank_t* Rank_next = new rank_t[n]; assert (Rank_next);
-  index_t* Next_next = duplicate (n, Next);
 
   //------------------------------------------------------------
   //
@@ -43,23 +73,15 @@ rankList__cilk__ (int n, rank_t* Rank, const index_t* Next)
   //
   // (you may also modify the preceding code if you wish)
   //
+#include "soln--cilk.cc"
   //------------------------------------------------------------
-
-  // If you use extra buffers, be sure to clean-up after yourself,
-  // e.g.,
-  if (Rank != Rank_cur) {
-    memcpy (Rank, Rank_cur, n * sizeof (rank_t));
-    delete[] Rank_cur;
-  } else { delete[] Rank_next; }
-  delete[] Next_next;
-  delete[] Next_cur;
 }
 
 void
-rankList__par (ParListRank_t* L)
+computeListRanks__par (ParRankedList_t* L)
 {
   assert (L != NULL);
-  rankList__cilk__ (L->n, L->Rank, L->Next);
+  computeListRanks__cilk__ (L->n, L->Next, L->Rank);
 }
 
 // eof

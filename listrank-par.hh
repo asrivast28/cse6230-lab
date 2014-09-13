@@ -26,7 +26,7 @@ extern "C" {
   void computeListRanks__par (ParRankedList_t* L);
 
   /** Sets up a data structure for testing rankList__par(). */
-  rank_t* getRanks__par (const ParRankedList_t* L);
+  const rank_t* getRanks__par (const ParRankedList_t* L);
 
   /**
    *  Frees parallel list rank data structure, L.

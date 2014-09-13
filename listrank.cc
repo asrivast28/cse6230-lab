@@ -4,8 +4,14 @@
  *  \brief Default (sequential) implementation.
  */
 
+#include <cassert>
 #include <strings.h> // for 'bzero'
+
+#include <iostream>
+
 #include "listrank.hh"
+
+using namespace std;
 
 /* ====================================================================== */
 

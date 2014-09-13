@@ -44,7 +44,7 @@ verifyParallelListRanker (size_t N)
   // Run the parallel implementation
   ParRankedList_t* rankedList = setupRanks__par (N, Next);
   computeListRanks__par (rankedList);
-  rank_t* Rank_par = getRanks__par (rankedList, Rank_par);
+  const rank_t* Rank_par = getRanks__par (rankedList);
 
   // Check the answer
   assertListRanksMatch (N, Rank_par, Rank_true);
