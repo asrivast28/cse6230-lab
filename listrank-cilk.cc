@@ -1,6 +1,6 @@
 // -*- mode:c++; tab-width:2; indent-tabs-mode:nil;  -*-
 /**
- *  \file listrank-par.cc
+ *  \file listrank-cilk.cc
  *
  *  \brief Implement the 'listrank-par.hh' interface using Cilk Plus.
  */
