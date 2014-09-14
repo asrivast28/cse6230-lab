@@ -22,13 +22,13 @@ extern "C" {
    */
   typedef struct ParRankedList_t__ ParRankedList_t;
 
-  /** Returns a new data structure for testing rankList__par(). */
+  /** Returns a new data structure for testing computeListRanks__par(). */
   ParRankedList_t* setupRanks__par (size_t n, const index_t* Next);
 
-  /** A parallel implementation of rankList__seq(); see 'listrank.hh' */
+  /** A parallel implementation of computeListRanks(); see 'listrank.hh' */
   void computeListRanks__par (ParRankedList_t* L);
 
-  /** Sets up a data structure for testing rankList__par(). */
+  /** After running computeListRanks__par(), use this routine to see the computed ranks. */
   const rank_t* getRanks__par (const ParRankedList_t* L);
 
   /**
