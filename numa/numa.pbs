@@ -18,7 +18,7 @@ echo "Current directory: ${PWD}"
 echo ""
 echo "=== Running 100 trials of NUMA on 10 million elements ... ==="
 export OMP_NUM_THREADS=6
-export GOMP_CPU_AFFINITY="0-22:2"
+export GOMP_CPU_AFFINITY="1-23:2"
 ./triad 10000000 100
 
 echo ""
