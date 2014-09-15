@@ -15,7 +15,9 @@ echo "Script began:" `date`
 echo "Node:" `hostname`
 echo "Current directory: ${PWD}"
 
-/nethome/rvuduc3/local/jinx/likwid/2.2.1-ICC/bin/likwid-topology -g
+echo ""
+echo "=== Running 100 trials of NUMA on 10 million elements ... ==="
+./triad 10000000 100
 
 echo ""
 echo "=== Done! ==="
