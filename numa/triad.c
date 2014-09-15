@@ -44,6 +44,7 @@ void initRandom__aligned (size_t n, real_t* A)
 {
   __assume_aligned (A, 16);
   size_t i;
+#pragma omp parallel for private(i) schedule(static)
   for (i = 0; i < n; ++i)
     A[i] = createRandomValue ();
 }
