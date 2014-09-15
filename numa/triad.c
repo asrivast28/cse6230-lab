@@ -21,6 +21,7 @@ void triad__aligned (size_t n, real_t* D, const real_t* A, const real_t b, const
   __assume_aligned (A, 16);
   __assume_aligned (C, 16);
   size_t i;
+#pragma omp parallel for private(i) schedule(static)
   for (i = 0; i < n; ++i) {
     D[i] = A[i] + b*C[i];
   }
