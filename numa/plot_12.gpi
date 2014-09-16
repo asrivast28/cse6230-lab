@@ -1,0 +1,29 @@
+set border 2 front linetype -1 linewidth 1.000
+set boxwidth 1.0 absolute
+set tmargin 5
+set bmargin 7
+set lmargin 10
+set style fill solid 0.25 border lt -1
+unset key
+set pointsize 0.5
+set style data boxplot
+set xtics border in scale 0,0 nomirror norotate  offset character 0, -1, 0 autojustify
+set xtics norangelimit
+set xtics font ",10"
+set xtics ("Sequential" 2, \
+           "Initialized by master\nRead from socket 0" 4, \
+           "Initialized by master\nRead from socket 1" 6, \
+           "Initialized by master\nRead from both the sockets" 8, \
+           "First touch" 10)
+set ytics border in scale 1,0.5 nomirror norotate offset character 0, 0, 0 autojustify
+set yrange [ 0 : 25 ] noreverse nowriteback
+set grid ytics lc rgb "#bbbbbb" lw 2 lt 0
+plot 'sequential.dat' every ::7 using (2):4, \
+     '12_core_0.dat' every ::7 using (4):4, \
+     '12_core_1.dat' every ::7 using (6):4, \
+     '12_core_both.dat' every ::7 using (8):4, \
+     '12_first_touch.dat' every ::7 using (10):4
+set ylabel font ",10"
+set ylabel "Effective Bandwidth (GB/s)" offset character 10, 30, 0 rotate by 0 center
+set title font ",20"
+set title "Demonstrating NUMA for OpenMP x 12"
