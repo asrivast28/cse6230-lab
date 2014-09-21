@@ -11,8 +11,8 @@ CUDAROOT = /opt/cuda-4.2/cuda
 NVCC = $(CUDAROOT)/bin/nvcc
 NVCFLAGS = --compiler-bindir=$(CC)
 NVCOPTFLAGS = $(COPTFLAGS)
-NVLDFLAGS =
-CUBLAS_LDFLAGS = -L$(CUDAROOT)/lib64 -Wl,-rpath $(CUDAROOT)/lib64 -lcudart -lcublas
+NVLDFLAGS = --linker-options -rpath --linker-options $(CUDAROOT)/lib64
+CUBLAS_LDFLAGS = -L$(CUDAROOT)/lib64 -Wl,-rpath -Wl,$(CUDAROOT)/lib64 -lcudart -lcublas
 
 MPICC = mpicc
 MPICFLAGS = $(CFLAGS)
