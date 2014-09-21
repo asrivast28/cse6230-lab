@@ -8,7 +8,7 @@ COMPFLAGS = -fopenmp
 LDFLAGS =
 
 CUDAROOT = /opt/cuda-4.2/cuda
-NVCC = nvcc
+NVCC = $(CUDAROOT)/bin/nvcc
 NVCFLAGS = --compiler-bindir=$(CC)
 NVCOPTFLAGS = $(COPTFLAGS)
 NVLDFLAGS =

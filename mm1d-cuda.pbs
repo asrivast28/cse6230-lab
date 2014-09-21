@@ -1,5 +1,5 @@
 #PBS -q class
-#PBS -l nodes=2
+#PBS -l nodes=2:gpu
 #PBS -l walltime=00:01:00
 #PBS -N mm1d-cuda
 
