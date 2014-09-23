@@ -52,6 +52,6 @@ listrank-cuda$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile \
 	$(CUDAC) $(CUDACFLAGS) -o $@ -c $<
 
 clean:
-	rm -f *~ core $(TARGETS)
+	rm -f *~ core $(TARGETS) *.o
 
 # eof
