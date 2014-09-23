@@ -46,7 +46,7 @@ listrank-cuda$(EXEEXT): $(CXXHDRS) $(CXXOBJS) $(COBJS) Makefile \
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 %.o: %.cc
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CXX) $(CFLAGS) -o $@ -c $<
 
 %.o: %.cu
 	$(CUDAC) $(CUDACFLAGS) -o $@ -c $<
