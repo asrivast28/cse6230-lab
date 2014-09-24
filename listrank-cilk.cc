@@ -14,8 +14,6 @@
 
 #include "listrank-par.hh"
 
-#include <cilk/reducer_opor.h>
-
 using namespace std;
 
 // ============================================================
