@@ -15,6 +15,9 @@
 
 #include "cuda_utils.h"
 
+#define cudaDeviceScheduleBlockingSync 0x04
+
+
 using namespace std;
 
 // ============================================================
@@ -35,8 +38,8 @@ struct ParRankedList_t__
   rank_t* Rank_host;
 
   // Buffers on the device (i.e., GPU)
-  index_t* Next_device;
-  rank_t* Rank_device;
+  index_t* Next_device[2];
+  rank_t* Rank_device[2];
 };
 
 // ============================================================
@@ -52,17 +55,16 @@ setupRanks__par (size_t n, const index_t* Next)
   L->Rank_host = createRanksBuffer (n);
 
   // Create buffers on the GPU:
-  CUDA_CHECK_ERROR (cudaMalloc (&(L->Next_device), n * sizeof (index_t)));
-  CUDA_CHECK_ERROR (cudaMalloc (&(L->Rank_device), n * sizeof (rank_t)));
+  for (size_t i = 0; i < 2; ++i) {
+    CUDA_CHECK_ERROR (cudaMalloc (&(L->Next_device[i]), n * sizeof (index_t)));
+    CUDA_CHECK_ERROR (cudaMalloc (&(L->Rank_device[i]), n * sizeof (rank_t)));
+  }
+
 
   // Copy CPU buffer contents to the GPU:
-  CUDA_CHECK_ERROR (cudaMemcpy (L->Next_device, L->Next_host,
+  CUDA_CHECK_ERROR (cudaMemcpy (L->Next_device[0], L->Next_host,
                                 n * sizeof (index_t),
                                 cudaMemcpyHostToDevice));
-  CUDA_CHECK_ERROR (cudaMemcpy (L->Rank_device, L->Rank_host,
-                                n * sizeof (rank_t),
-                                cudaMemcpyHostToDevice));
-
   return L;
 }
 
@@ -72,8 +74,12 @@ void releaseRanks__par (ParRankedList_t* L)
     releaseRanksBuffer (L->Rank_host);
 
     // Free GPU buffers:
-    CUDA_CHECK_ERROR (cudaFree (L->Next_device));
-    CUDA_CHECK_ERROR (cudaFree (L->Rank_device));
+    for (size_t i = 0; i < 2; ++i) {
+      CUDA_CHECK_ERROR (cudaFree (L->Next_device[i]));
+      CUDA_CHECK_ERROR (cudaFree (L->Rank_device[i]));
+    }
+    L->Next_host = NULL;
+    L->Rank_host = NULL;
   }
 }
 
@@ -83,7 +89,7 @@ const rank_t *
 getRanks__par (const ParRankedList_t* L)
 {
   // Copy GPU results back to the CPU:
-  CUDA_CHECK_ERROR (cudaMemcpy (L->Rank_host, L->Rank_device,
+  CUDA_CHECK_ERROR (cudaMemcpy (L->Rank_host, L->Rank_device[0],
                                 L->n * sizeof (rank_t),
                                 cudaMemcpyDeviceToHost));
   return L->Rank_host;
@@ -97,17 +103,44 @@ getRanks__par (const ParRankedList_t* L)
  *  implementations.
  */
 __global__ void
-computeListRanks__init (size_t n, const index_t* Next, rank_t* Rank)
+initListRanks__init (const size_t n, rank_t* Rank, const index_t* Next)
 {
   const unsigned int BID = blockIdx.y * gridDim.x + blockIdx.x; // block ID
   const unsigned int LID = threadIdx.x;  // local thread ID
   const int TPB = blockDim.x; // threads per block
   const unsigned int k = BID * TPB + LID;
+
   if (k < n)
     Rank[k] = (Next[k] == NIL) ? 0 : 1;
 }
 
-//#include "soln--cuda1.cu" // Instructor's solution: none for you!
+__global__ void
+computeListRanks__init (ParRankedList_t L)
+{
+  const unsigned int BID = blockIdx.y * gridDim.x + blockIdx.x; // block ID
+  const unsigned int LID = threadIdx.x;  // local thread ID
+  const int TPB = blockDim.x; // threads per block
+  const unsigned int k = BID * TPB + LID;
+
+  if (k >= L.n) {
+    return;
+  }
+
+  index_t* N_cur = L.Next_device[0];
+  index_t* N_next = L.Next_device[1];
+
+  rank_t* R_cur = L.Rank_device[0];
+  rank_t* R_next = L.Rank_device[1];
+
+  if (N_cur[k] != NIL) {
+    R_next[k] = R_cur[k] + R_cur[N_cur[k]];
+    N_next[k] = N_cur[N_cur[k]];
+  }
+  else {
+    R_next[k] = R_cur[k];
+    N_next[k] = NIL;
+  }
+}
 
 void
 computeListRanks__par (ParRankedList_t* L)
@@ -121,18 +154,22 @@ computeListRanks__par (ParRankedList_t* L)
   dim3 GB (GB_X, (blocks + GB_X - 1) / GB_X, 1);
   dim3 TB (MAX_THREADS_PER_BLOCK, 1, 1);
 
-  computeListRanks__init<<<GB, TB>>> (L->n, L->Next_device, L->Rank_device);
+  size_t maxIterations = static_cast<size_t>(ceil(log2(static_cast<double>(L->n)))); 
 
-  //------------------------------------------------------------
-  //
-  // ... YOUR CODE GOES HERE ...
-  //
-  // (you may also modify the preceding code if you wish)
-  //
-  //#include "soln--cuda2.cu"  // Instructor's solution: none for you!
-  //------------------------------------------------------------
+  initListRanks__init<<<GB, TB>>> (L->n, L->Rank_device[0], L->Next_device[0]);
 
-  cudaThreadSynchronize ();
+  for (size_t it = 0; it < maxIterations; ++it) {
+    computeListRanks__init<<<GB, TB>>> (*L);
+
+    index_t* N_temp = L->Next_device[0];
+    L->Next_device[0] = L->Next_device[1];
+    L->Next_device[1] = N_temp;
+
+    rank_t* R_temp = L->Rank_device[0];
+    L->Rank_device[0] = L->Rank_device[1];
+    L->Rank_device[1] = R_temp;
+  }
+  cudaDeviceSynchronize();
 }
 
 // eof
