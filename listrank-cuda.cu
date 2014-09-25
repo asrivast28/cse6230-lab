@@ -131,6 +131,8 @@ computeListRanks__par (ParRankedList_t* L)
   //
   //#include "soln--cuda2.cu"  // Instructor's solution: none for you!
   //------------------------------------------------------------
+
+  cudaThreadSynchronize ();
 }
 
 // eof
