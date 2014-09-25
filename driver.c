@@ -22,7 +22,7 @@ extern void bcast (int* data, const int len);
 #define MIN_MSGLEN 1
 
 /** Largest message to test (in words) */
-#define MAX_MSGLEN (1 << 24)
+#define MAX_MSGLEN (1 << 28)
 
 /** Minimum time (seconds) for a set of trials */
 #define MIN_TIME 0.2
