@@ -1,0 +1,30 @@
+=== OpenMP is enabled, with 24 threads. ===
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+	(Array is sorted.)
+	(Array is sorted.)
+	(Arrays are equal.)
+=== OpenMP is enabled, with 24 threads. ===
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+	(Array is sorted.)
+	(Array is sorted.)
+	(Arrays are equal.)
+=== OpenMP is enabled, with 24 threads. ===
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+	(Array is sorted.)
+	(Array is sorted.)
+	(Arrays are equal.)
+=== OpenMP is enabled, with 24 threads. ===
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+	(Array is sorted.)
+	(Array is sorted.)
+	(Arrays are equal.)
+=== OpenMP is enabled, with 24 threads. ===
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+	(Array is sorted.)
+	(Array is sorted.)
+	(Arrays are equal.)
