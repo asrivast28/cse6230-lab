@@ -190,12 +190,27 @@ reduceSeqAdd (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 __global__ void 
 reduceFirstAddKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
-	/* As it can be seen from `reduceSeqAdd`, the total number of threads
-		 have been halved */
-	/* Thus, you need to load 2 elements from the global memory, add them, and
-		 then store the sum in the shared memory before reduction over the shared
-		 memory occurs */
+	__shared__ dtype buffer[BS];
+	unsigned int tid = blockIdx.x * blockDim.x * 2 + threadIdx.x;
+	unsigned int stride;
+	
+	if(tid < N) {
+		buffer[threadIdx.x] = In[tid] + In[tid + blockDim.x];
+	} else {
+		buffer[threadIdx.x] = (dtype) 0.0;
+	}
+	__syncthreads ();
+
+  for (stride = blockDim.x / 2; stride > 0; stride /= 2) {
+    if ((threadIdx.x < stride) && ((threadIdx.x + stride) < blockDim.x)) {
+      buffer[threadIdx.x] += buffer[threadIdx.x + stride];
+    }
+		__syncthreads ();
+	}
+
+	if(threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
