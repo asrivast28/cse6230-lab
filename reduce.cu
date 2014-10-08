@@ -77,7 +77,28 @@ reduceNaive (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 __global__ void 
 reduceNonDivergeKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
+	__shared__ dtype buffer[BS];
+	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int stride, index;
+	
+	if(tid < N) {
+		buffer[threadIdx.x] = In[tid];
+	} else {
+		buffer[threadIdx.x] = (dtype) 0.0;
+	}
+	__syncthreads ();
+
+  for (stride = 1; stride < blockDim.x; stride *= 2) {
+    index = 2 * stride * threadIdx.x;
+    if ((index + stride) < blockDim.x) {
+      buffer[index] += buffer[index + stride];
+    }
+		__syncthreads ();
+	}
+
+	if(threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
