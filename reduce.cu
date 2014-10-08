@@ -134,8 +134,27 @@ reduceNonDiverge (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 __global__ void 
 reduceSeqAddKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
-	/* Replicate the access pattern as shown the lecture slides for version 3 */
+	__shared__ dtype buffer[BS];
+	unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int stride;
+	
+	if(tid < N) {
+		buffer[threadIdx.x] = In[tid];
+	} else {
+		buffer[threadIdx.x] = (dtype) 0.0;
+	}
+	__syncthreads ();
+
+  for (stride = blockDim.x / 2; stride > 0; stride /= 2) {
+    if ((threadIdx.x < stride) && ((threadIdx.x + stride) < blockDim.x)) {
+      buffer[threadIdx.x] += buffer[threadIdx.x + stride];
+    }
+		__syncthreads ();
+	}
+
+	if(threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
