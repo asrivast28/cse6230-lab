@@ -243,11 +243,47 @@ reduceFirstAdd (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 
 }
 
+__device__ void
+warpReduce (volatile dtype* buffer, unsigned int tid, unsigned int blockSize)
+{
+  if ((tid + 32) < blockSize) buffer[tid] += buffer[tid + 32]; 
+  if ((tid + 16) < blockSize) buffer[tid] += buffer[tid + 16]; 
+  if ((tid + 8) < blockSize) buffer[tid] += buffer[tid + 8]; 
+  if ((tid + 4) < blockSize) buffer[tid] += buffer[tid + 4]; 
+  if ((tid + 2) < blockSize) buffer[tid] += buffer[tid + 2]; 
+  if ((tid + 1) < blockSize) buffer[tid] += buffer[tid + 1]; 
+}
+
 __global__ void 
 reduceUnrollLastKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
-	/* unroll the loop when there are fewer than 32 threads working */
+	__shared__ dtype buffer[BS];
+	unsigned int tid = blockIdx.x * blockDim.x * 2 + threadIdx.x;
+	unsigned int stride;
+	
+	if((tid + blockDim.x) < N) {
+		buffer[threadIdx.x] = In[tid] + In[tid + blockDim.x];
+	} else if (tid < N) {
+    buffer[threadIdx.x] = In[tid];
+  } else {
+		buffer[threadIdx.x] = (dtype) 0.0;
+	}
+	__syncthreads ();
+
+  for (stride = blockDim.x / 2; stride > 32; stride /= 2) {
+    if ((threadIdx.x < stride) && ((threadIdx.x + stride) < blockDim.x)) {
+      buffer[threadIdx.x] += buffer[threadIdx.x + stride];
+    }
+		__syncthreads ();
+	}
+  
+  if (threadIdx.x < 32) {
+    warpReduce (buffer, threadIdx.x, blockDim.x);
+  }
+
+	if (threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
