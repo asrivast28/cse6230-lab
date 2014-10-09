@@ -381,9 +381,34 @@ reduceUnrollAll (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 __global__ void 
 reduceMultAddKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
-	/* Instead of just adding 2 elements in the beginning, try adding more 
-		 before reducing the partial sums over the shared memory */
+  __shared__ dtype buffer[BS];
+  unsigned int tid = 2 * blockIdx.x * blockDim.x  + threadIdx.x;
+  unsigned int gridSize = 2 * gridDim.x * blockDim.x;
+
+  buffer[threadIdx.x] = 0;
+  while (tid < N) {
+    if ((tid + blockDim.x) < N) {
+      buffer[threadIdx.x] += (In[tid] + In[tid + blockDim.x]);
+    }
+    else if (tid < N) {
+      buffer[threadIdx.x] += In[tid];
+    }
+    tid += gridSize;
+  }
+  __syncthreads ();
+
+  if (BS >= 1024) if (threadIdx.x < 512) { buffer[threadIdx.x] += buffer[threadIdx.x + 512]; __syncthreads(); }
+  if (BS >= 512) if (threadIdx.x < 256) { buffer[threadIdx.x] += buffer[threadIdx.x + 256]; __syncthreads(); } 
+  if (BS >= 256) if (threadIdx.x < 128) { buffer[threadIdx.x] += buffer[threadIdx.x + 128]; __syncthreads(); } 
+  if (BS >= 128) if (threadIdx.x < 64) { buffer[threadIdx.x] += buffer[threadIdx.x + 64]; __syncthreads(); } 
+
+  if (threadIdx.x < 32) {
+    warpReduce (buffer, threadIdx.x, blockDim.x);
+  }
+
+	if (threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
