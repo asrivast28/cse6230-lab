@@ -320,9 +320,30 @@ reduceUnrollLast (dtype* d_In, dtype* d_Out, dtype* h_Out, unsigned int N)
 __global__ void 
 reduceUnrollAllKernel (dtype* In, dtype *Out, unsigned int N)
 {
-	/* Fill in your code here */
-	/* do a complete unrolling using #define or -D compiler option to specify 
-		 the thread block size */
+  __shared__ dtype buffer[BS];
+  unsigned int tid = blockIdx.x * blockDim.x * 2 + threadIdx.x;
+  
+  if((tid + blockDim.x) < N) {
+    buffer[threadIdx.x] = In[tid] + In[tid + blockDim.x];
+  } else if (tid < N) {
+    buffer[threadIdx.x] = In[tid];
+  } else {
+    buffer[threadIdx.x] = (dtype) 0.0;
+  }
+  __syncthreads ();
+
+  if (BS >= 1024) if (threadIdx.x < 512) { buffer[threadIdx.x] += buffer[threadIdx.x + 512]; __syncthreads(); }
+  if (BS >= 512) if (threadIdx.x < 256) { buffer[threadIdx.x] += buffer[threadIdx.x + 256]; __syncthreads(); } 
+  if (BS >= 256) if (threadIdx.x < 128) { buffer[threadIdx.x] += buffer[threadIdx.x + 128]; __syncthreads(); } 
+  if (BS >= 128) if (threadIdx.x < 64) { buffer[threadIdx.x] += buffer[threadIdx.x + 64]; __syncthreads(); } 
+
+  if (threadIdx.x < 32) {
+    warpReduce (buffer, threadIdx.x, blockDim.x);
+  }
+
+	if (threadIdx.x == 0) {
+		Out[blockIdx.x] = buffer[0];
+	}
 }
 
 
