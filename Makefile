@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
-CC = gcc44
-CXX = g++44
+CC = /usr/bin/gcc44
+CXX = /usr/bin/g++44
 CFLAGS = -std=gnu99
 COPTFLAGS = -O2 -g
 COMPFLAGS = -fopenmp
