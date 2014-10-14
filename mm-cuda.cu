@@ -31,14 +31,14 @@ static void assert_status (cublasStatus_t stat);
 extern "C"
 void
 mm_local (const int m, const int n, const int k,
-	  const float* A, const int lda,
-	  const float* B, const int ldb,
-	  float* C, const int ldc)
+	  const float* A_cpu_pinned, const int lda,
+	  const float* B_cpu_pinned, const int ldb,
+	  float* C_cpu_pinned, const int ldc)
 {
   mm_init ();
-  assert (A || m <= 0 || k <= 0); assert (lda >= m);
-  assert (B || k <= 0 || n <= 0); assert (ldb >= k);
-  assert (C || m <= 0 || n <= 0); assert (ldc >= m);
+  assert (A_cpu_pinned || m <= 0 || k <= 0); assert (lda >= m);
+  assert (B_cpu_pinned || k <= 0 || n <= 0); assert (ldb >= k);
+  assert (C_cpu_pinned || m <= 0 || n <= 0); assert (ldc >= m);
 
   float* A_gpu;
   cudaMalloc ((void **)&A_gpu, m * k * sizeof (float)); assert (A_gpu);
@@ -46,9 +46,9 @@ mm_local (const int m, const int n, const int k,
   cudaMalloc ((void **)&B_gpu, k * n * sizeof (float)); assert (B_gpu);
   float* C_gpu;
   cudaMalloc ((void **)&C_gpu, m * n * sizeof (float)); assert (C_gpu);
-  cudaMemcpy (A_gpu, A, m * k * sizeof (float), cudaMemcpyDefault);
-  cudaMemcpy (B_gpu, B, k * n * sizeof (float), cudaMemcpyDefault);
-  cudaMemcpy (C_gpu, C, m * n * sizeof (float), cudaMemcpyDefault);
+  cudaMemcpy (A_gpu, A_cpu_pinned, m * k * sizeof (float), cudaMemcpyHostToDevice);
+  cudaMemcpy (B_gpu, B_cpu_pinned, k * n * sizeof (float), cudaMemcpyHostToDevice);
+  cudaMemcpy (C_gpu, C_cpu_pinned, m * n * sizeof (float), cudaMemcpyHostToDevice);
 
   const float ONE = 1.0;
   cublasStatus_t stat = cublasSgemm (handle__, CUBLAS_OP_N, CUBLAS_OP_N,
@@ -57,7 +57,7 @@ mm_local (const int m, const int n, const int k,
 				     &ONE, C_gpu, ldc);
   assert_status (stat);
 
-  cudaMemcpy (C, C_gpu, m * n * sizeof (float), cudaMemcpyDefault);
+  cudaMemcpy (C_cpu_pinned, C_gpu, m * n * sizeof (float), cudaMemcpyDeviceToHost);
   cudaFree (C_gpu);
   cudaFree (B_gpu);
   cudaFree (A_gpu);
@@ -67,16 +67,17 @@ extern "C"
 float *
 mm_create (int m, int n)
 {
-  float* A = (float *)malloc (m * n * sizeof (float));
-  assert (A);
-  return A;
+  float* A_cpu_pinned = NULL;
+  cudaHostAlloc ((void **)&A_cpu_pinned, m * n * sizeof(float), cudaHostAllocMapped | cudaHostAllocPortable);
+  assert (A_cpu_pinned);
+  return A_cpu_pinned;
 }
 
 extern "C"
 void
-mm_free (float* A)
+mm_free (float* A_cpu_pinned)
 {
-  if (A) free (A);
+  if (A_cpu_pinned) cudaFreeHost (A_cpu_pinned);
 }
 
 /* ====================================================================== */
