@@ -102,10 +102,10 @@ mm1d (int n,
     float* tmp = B_buffered[SEND];
     B_buffered[SEND] = B_buffered[RECV];
     B_buffered[RECV] = tmp;
-  }
 
-  if (B_buffered[SEND] != B_local)
-    memcpy (B_local, B_buffered[SEND], n_by_P * n * sizeof (float));
+  	if (B_buffered[SEND] != B_local)
+    	memcpy (B_local, B_buffered[SEND], n_by_P * n * sizeof (float));
+  }
 
   return t_comp;
 }
