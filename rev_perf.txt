@@ -1,0 +1,21 @@
+n = 16777216 (~ 64.0 MiB)
+Test 1: Using 'malloc' on CPU...
+benchmarkReverseWithCopies: Testing...
+==> Passed!
+
+benchmarkReverseWithCopies: Timing...
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+==> 54 trials took 2.02895 seconds.
+Test 2: Using pinned cudaHostAlloc...
+benchmarkReverseWithoutCopies: Testing...
+==> Passed!
+
+benchmarkReverseWithoutCopies: Timing...
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+==> 121 trials took 2.00428 seconds.
+==> Reversal with explicit copies: 0.0375731 seconds (3.57217 effective GB/s)
+
+==> Reversal without explicit copies: 0.0165643 seconds (8.10281 effective GB/s)
+

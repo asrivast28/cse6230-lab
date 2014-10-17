@@ -1,0 +1,18 @@
+Adding user asrivastava64 to group authjobs
+*** STARTED: Tue Oct 14 12:31:04 EDT 2014 on jinx5 ***
+/nethome/asrivastava64/lab6-ankitsri
+jinx5
+jinx7
+
+
+
+========================================
+Problem dimension: n = 4096
+Number of MPI ranks: 2
+Number of trials: 3
+Time per trial (max over all processes): 0.652681 seconds
+Computation time per trial (max over all processes): 0.612029 seconds
+Effective performance: 210.6 GFLOP/s
+========================================
+*** COMPLETED: Tue Oct 14 12:31:10 EDT 2014 on jinx5 ***
+Removing user asrivastava64 from group authjobs
