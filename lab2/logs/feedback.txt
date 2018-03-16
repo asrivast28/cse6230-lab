@@ -1,0 +1,5 @@
+Part 1 is not correctly parallelized. If the placement of the pragmas is fixed
+the performance increases by ~5x. Please refer to the sample solutions when they
+are posted.
+
+Part 2 has good analysis and documentation.

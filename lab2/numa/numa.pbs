@@ -1,0 +1,27 @@
+#PBS -q class
+#PBS -l nodes=jinx8
+#PBS -l walltime=00:04:00
+#PBS -N numa
+
+# Changes to the directory we were in when we
+# submit the job:
+
+cd $PBS_O_WORKDIR
+
+# Runs a bunch of standard command-line
+# utilities, just as an example:
+
+echo "Script began:" `date`
+echo "Node:" `hostname`
+echo "Current directory: ${PWD}"
+
+echo ""
+echo "=== Running 100 trials of NUMA on 10 million elements ... ==="
+export OMP_NUM_THREADS=12
+export GOMP_CPU_AFFINITY="0-11:1"
+./triad 10000000 100
+
+echo ""
+echo "=== Done! ==="
+
+# eof

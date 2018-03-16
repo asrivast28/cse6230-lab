@@ -1,0 +1,59 @@
+For demonstrating the effect of NUMA, I did something similar to what was suggested in the class.
+
+TRIAL RUNS & GENERATING DATA
+-------------------------------
+
+I chose 'jinx8' node as the site for my experiments and ran all the tests on this node. First up,
+I dumped topology of this node in 'topology.dat' file. From the topology, it was evident that even
+numbered "cores" resided on socket 0 whereas socket 1 is home to odd numbered cores on jinx8 node.
+I collected 100 data points and ran the triad test using 10 million elements for each of the
+following scenarios:
+
+1) Sequential: This case takes into account data for triad calculation without any concurrency.
+               This serves as a base case.
+
+2) OpenMP x 6: This consists of four different scenarios.
+   a) Core 0: In this case, only the even nodes, i.e., the ones on core 0 are used for threading.
+              The data for this scenario is saved in '6_core_0.dat'
+   b) Core 1: In this case, only the odd nodes, i.e., the ones on core 1 are used for threading.
+              The data for this scenario is saved in '6_core_1.dat'
+   c) Core 0 & 1: In this case, 3 odd and 3 even nodes are used for threading, i.e., both the cores
+                  are used for threading. However, the data is initialized by master thread which means
+                  that data in memory may reside anywhere. The data for this scenario is saved in '6_core_both.dat'
+   d) First touch: This is similar to the above scenario except for the fact that data is initialized
+                   by all the threads. Using static scheduling during initialization as well as triad
+                   operations, we request that the data is first touched by the thread which is going to use it
+                   so that it is allocated closer to the socket on which the thread resides.
+                   The data for this scenario is saved in '6_first_touch.dat'
+
+3) OpenMP x 12: This is same as the above case except for increase in number of threads from 6 to 12.
+   a) Core 0: The data for this scenario is stored in '12_core_0.dat'
+   b) Core 1: The data for this scenario is stored in '12_core_1.dat'
+   c) Core 0 & 1: The data for this scenario is stored in '12_core_both.dat'
+   d) First touch: The data for this scenario is stored in '12_first_touch.dat'
+
+
+PLOTS
+------
+
+Using the data generated during the trial runs, I created two plots 'plot_6.jpg' and 'plot_12.jpg', using
+gnuplot files 'plot_6.gpi' and 'plot_12.gpi' respectively, of effective bandwidth in different scenarios.
+
+
+OBSERVATIONS & CONCLUSIONS
+--------------------------
+
+First of all, the bandwidth is lowest in sequential case, which was expected.
+Then, all the other scenarios follow the same pattern in both 6 as well as 12 thread case. The case when
+all the threads are on socket 1 is the slowest, followed by the case in which all the threads are on
+socket 0 and initialization is done by master thread. This scenario is marginally faster than the scenario
+when all the threads are on socket 0.
+
+The fastest scenario, however, is the case when threads are distributed across sockets and initialization
+and calculations are done using a parallel for loop with static scheduling, which would most probably assign
+same threads for same chunks of the for loop during initialization as well as calculation. This means that every
+thread will be working with data which is as close to it as possible, therefore resulting in an increased bandwidth.
+
+It can therefore be concluded that the best performance, in terms of memory access, is achieved when the work is
+distributed across sockets and the data for each thread is as close to it as possible, thus demonstrating the perils
+of NUMA.
