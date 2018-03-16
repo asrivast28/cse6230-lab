@@ -1,0 +1,13 @@
+n = 16777216 (~ 64.0 MiB)
+
+Timer: gettimeofday
+Timer resolution: ~ 1 us (?)
+Detected 2 GPUs.
+Test 1: Buffering GPU-to-GPU copy using CPU memory...
+  [15 trials]
+Test 2: Direct GPU-to-GPU copy...
+  [26 trials]
+==> GPU-to-GPU copy, buffered through CPU memory: 0.0668967 seconds (2.00634 GB/s)
+
+==> Direct GPU-to-GPU copy: 0.0399213 seconds (3.36206 GB/s)
+
