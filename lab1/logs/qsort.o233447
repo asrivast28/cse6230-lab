@@ -1,0 +1,44 @@
+Adding user vbedia3 to group authjobs
+Script began: Fri Sep 19 07:01:32 EDT 2014
+Node: jinx4
+Current directory: /nethome/vbedia3/lab1-ankitsri
+
+=== Running 5 trials of Quicksort on 10 million elements ... ===
+*** Trial 1 ***
+
+N == 10000000
+
+Sequential: 1.96179 seconds ==> 5.09739 million keys per second
+Parallel sort: 0.166799 seconds ==> 59.9524 million keys per second
+
+*** Trial 2 ***
+
+N == 10000000
+
+Sequential: 1.95997 seconds ==> 5.10213 million keys per second
+Parallel sort: 0.171163 seconds ==> 58.4238 million keys per second
+
+*** Trial 3 ***
+
+N == 10000000
+
+Sequential: 1.96079 seconds ==> 5.1 million keys per second
+Parallel sort: 0.165134 seconds ==> 60.5569 million keys per second
+
+*** Trial 4 ***
+
+N == 10000000
+
+Sequential: 1.96098 seconds ==> 5.09949 million keys per second
+Parallel sort: 0.172254 seconds ==> 58.0538 million keys per second
+
+*** Trial 5 ***
+
+N == 10000000
+
+Sequential: 1.96091 seconds ==> 5.09968 million keys per second
+Parallel sort: 0.17182 seconds ==> 58.2004 million keys per second
+
+
+=== Done! ===
+Removing user vbedia3 from group authjobs

@@ -1,0 +1,2 @@
+1. Code meets the performance requirement
+2. Final commit before the submission deadline
